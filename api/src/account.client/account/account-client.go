@@ -30,22 +30,16 @@ func NewAccountClient(settings AccountServerSettings) *AccountClient {
 
 func (a AccountClient) CreateAccount(accountData AccountData) AccountCreatedResponse {
 	data := ParseFrom(accountData)
-	request, _ := http.NewRequest(http.MethodPost, fmt.Sprintf("%s%s", a.settings.url, ApiSuffix), data)
-	request.Header.Add("Content-Type", "application/vnd.api+json")
-	response, err := a.client.Do(request)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer response.Body.Close()
-
-	bodyBytes, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	accountCreated := AccountCreatedResponse{}
-	err = json2.Unmarshal(bodyBytes, &accountCreated)
-	return accountCreated
+	request := NewRequestExecutionBuilder(a.client).
+		withUrl(a.settings.url).
+		withUrlSuffix("/v1/organisation/accounts").
+		withMethod(http.MethodPost).
+		withBody(data).
+		withHeader("Content-Type", "application/vnd.api+json").
+		build().
+		handle()
+	response := ParseTo(request.Body)
+	return response
 }
 
 func (a AccountClient) FetchAccount(id string) FetchAccountQuery {
