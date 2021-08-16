@@ -2,8 +2,6 @@ package account
 
 import (
 	json2 "encoding/json"
-	 "./common"
-	 "./model"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -22,7 +20,7 @@ func NewAccountClient(settings AccountServerSettings) *AccountClient {
 		Transport:     nil,
 		CheckRedirect: nil,
 		Jar:           nil,
-		Timeout:       5000,
+		Timeout:       0,
 	}
 	return &AccountClient{
 		settings: settings,
@@ -30,8 +28,8 @@ func NewAccountClient(settings AccountServerSettings) *AccountClient {
 	}
 }
 
-func (a AccountClient) CreateAccount(accountData model.AccountData) model.AccountCreatedResponse {
-	data := common.ParseFrom(accountData)
+func (a AccountClient) CreateAccount(accountData AccountData) AccountCreatedResponse {
+	data := ParseFrom(accountData)
 	request, _ := http.NewRequest(http.MethodPost, fmt.Sprintf("%s%s", a.settings.url, ApiSuffix), data)
 	request.Header.Add("Content-Type", "application/vnd.api+json")
 	response, err := a.client.Do(request)
@@ -45,12 +43,12 @@ func (a AccountClient) CreateAccount(accountData model.AccountData) model.Accoun
 		log.Fatal(err)
 	}
 
-	accountCreated := model.AccountCreatedResponse{}
+	accountCreated := AccountCreatedResponse{}
 	err = json2.Unmarshal(bodyBytes, &accountCreated)
 	return accountCreated
 }
 
-func (a AccountClient) FetchAccount(id string) model.FetchAccountQuery {
+func (a AccountClient) FetchAccount(id string) FetchAccountQuery {
 	getRequest, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s%s/%s", a.settings.url, ApiSuffix, id), nil)
 	if err != nil {
 		log.Fatal(err)
@@ -62,7 +60,7 @@ func (a AccountClient) FetchAccount(id string) model.FetchAccountQuery {
 	if err != nil {
 		log.Fatal(err)
 	}
-	data := model.FetchAccountQuery{}
+	data := FetchAccountQuery{}
 	err = json2.Unmarshal(bodyBytes, &data)
 	return data
 }

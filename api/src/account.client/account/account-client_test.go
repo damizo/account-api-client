@@ -5,7 +5,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/testcontainers/testcontainers-go"
 	"path/filepath"
-	"model"
 	"strings"
 	"testing"
 	"time"
@@ -17,7 +16,7 @@ var id = uuid.New().String()
 var compose = testcontainers.NewLocalDockerCompose(nil, "")
 
 func TestRunDockerContainers(t *testing.T) {
-	abs, _ := filepath.Abs("../../docker-compose.yml")
+	abs, _ := filepath.Abs("../../../../docker-compose.yml")
 	composeFilePaths := []string{abs}
 
 	identifier := strings.ToLower(uuid.New().String())
@@ -36,8 +35,8 @@ func Test_Should_Create_Account(t *testing.T) {
 	actualAccount := accountClient.CreateAccount(accountData)
 	version := int64(0)
 
-	expectedCreatedAccount := model.AccountCreatedResponse{Data: model.AccountCreated{
-		Attributes: model.AccountAttributes{
+	expectedCreatedAccount := AccountCreatedResponse{Data: AccountCreated{
+		Attributes: AccountAttributes{
 			BankID:       "400302",
 			BankIDCode:   "GBDSC",
 			BaseCurrency: "GBP",
@@ -52,7 +51,7 @@ func Test_Should_Create_Account(t *testing.T) {
 		CreatedOn:      time.Time{},
 		ModifiedOn:     time.Time{},
 	},
-		Link: model.Link{Self: "/v1/organisation/accounts/" + id},
+		Link: Link{Self: "/v1/organisation/accounts/" + id},
 	}
 
 	assert.Equal(t, expectedCreatedAccount.Link, actualAccount.Link)
@@ -67,8 +66,8 @@ func Test_Should_Fetch_Account(t *testing.T) {
 
 	actualAccount := accountClient.FetchAccount(id)
 	version := int64(0)
-	expectedFetchAccountQuery := model.FetchAccountQuery{Data: model.AccountData{
-		Attributes: model.AccountAttributes{
+	expectedFetchAccountQuery := FetchAccountQuery{Data: AccountData{
+		Attributes: AccountAttributes{
 			BankID:       "400302",
 			BankIDCode:   "GBDSC",
 			BaseCurrency: "GBP",
@@ -80,7 +79,7 @@ func Test_Should_Fetch_Account(t *testing.T) {
 		Version:        &version,
 		OrganisationID: "eb0bd6f5-c3f5-44b2-b677-acd23cdde73c",
 		Type:           "accounts",
-	}, Link: model.Link{Self: "/v1/organisation/accounts/" + id}}
+	}, Link: Link{Self: "/v1/organisation/accounts/" + id}}
 	assert.Equal(t, expectedFetchAccountQuery, actualAccount)
 }
 
@@ -91,9 +90,9 @@ func Test_Should_Delete_Account(t *testing.T) {
 	assert.Emptyf(t, fetchAccountResult, "")
 }
 
-func buildAccountData(names []string, country string, id string) model.AccountData {
-	return model.AccountData{
-		Attributes: model.AccountAttributes{
+func buildAccountData(names []string, country string, id string) AccountData {
+	return AccountData{
+		Attributes: AccountAttributes{
 			BankID:       "400302",
 			BankIDCode:   "GBDSC",
 			BaseCurrency: "GBP",
