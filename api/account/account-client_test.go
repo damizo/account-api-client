@@ -5,6 +5,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/testcontainers/testcontainers-go"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -16,9 +17,12 @@ var accountClient = NewAccountClient(settings)
 var id = uuid.New().String()
 var compose = testcontainers.NewLocalDockerCompose(nil, "")
 
-func TestRunDockerContainers(t *testing.T) {
+func TestMain(m *testing.M) {
+	// Write code here to run before tests
 	abs, _ := filepath.Abs("../../docker-compose.yml")
 	composeFilePaths := []string{abs}
+
+	fmt.Println("HELLO!")
 
 	identifier := strings.ToLower(uuid.New().String())
 	compose = testcontainers.NewLocalDockerCompose(composeFilePaths, identifier)
@@ -26,6 +30,16 @@ func TestRunDockerContainers(t *testing.T) {
 		WithCommand([]string{"up", "-d", "--force-recreate"}).
 		Invoke()
 	time.Sleep(2 * time.Second)
+	// Run tests
+	exitVal := m.Run()
+
+
+	down := compose.Down()
+	fmt.Println(down)
+	// Write code here to run after tests
+
+	// Exit with exit value from tests
+	os.Exit(exitVal)
 }
 
 func Test_Should_Create_Account(t *testing.T) {
@@ -82,6 +96,17 @@ func Test_Should_Fetch_Account(t *testing.T) {
 		Type:           "accounts",
 	}, Link: Link{Self: "/v1/organisation/accounts/" + id}}
 	assert.Equal(t, expectedFetchAccountQuery, actualAccount)
+}
+
+func Test_Should_Not_Fetch_Account_When_Does_Not_Exist(t *testing.T) {
+	randomId := uuid.New().String()
+	_, e := accountClient.FetchAccount(randomId)
+	assert.Equal(t, e.ErrorMessage, fmt.Sprintf("record %s does not exist", randomId))
+}
+
+func Test_Should_Not_Delete_Account_When_Does_Not_Exist(t *testing.T) {
+	randomId := uuid.New().String()
+	accountClient.DeleteAccount(randomId)
 }
 
 func Test_Should_Delete_Account(t *testing.T) {

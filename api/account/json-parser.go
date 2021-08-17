@@ -3,15 +3,17 @@ package account
 import (
 	"bytes"
 	json2 "encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"strings"
 )
 
 const ErrorMessageWildcard = "error_message"
 
-func ParseFrom(data AccountData) *bytes.Buffer{
+func ParseFrom(data AccountData) *bytes.Buffer {
 	accountData := CreateAccountCommand{Data: data}
 	json, _ := json2.Marshal(accountData)
 	reader := bytes.NewBuffer(json)
@@ -50,4 +52,16 @@ func ParseToFetchQueryResponse(data io.Reader) (FetchAccountQuery, Error) {
 	fetchAccountQuery := FetchAccountQuery{}
 	err = json2.Unmarshal(bodyBytes, &fetchAccountQuery)
 	return fetchAccountQuery, Error{}
+}
+
+func ParseToAccountDeletedResponse(id string, response *http.Response) (AccountDeletedResponse, Error) {
+	if isSuccess(response) {
+		return AccountDeletedResponse{ID: id}, Error{}
+	} else {
+		return AccountDeletedResponse{}, Error{ErrorMessage: fmt.Sprintf("delete account for id %s ended with failure, status code: %d", id, response.StatusCode)}
+	}
+}
+
+func isSuccess(response *http.Response) bool {
+	return response.StatusCode == 200 || response.StatusCode == 201 || response.StatusCode == 204
 }

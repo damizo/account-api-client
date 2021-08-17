@@ -56,9 +56,8 @@ type AccountCreatedResponse struct {
 }
 
 type AccountDeletedResponse struct {
-	value string
+	ID string
 }
-
 
 type CreateAccountCommand struct {
 	Data AccountData `json:"data"`

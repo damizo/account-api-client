@@ -50,14 +50,16 @@ func (a AccountClient) FetchAccount(id string) (FetchAccountQuery, Error) {
 	return ParseToFetchQueryResponse(request.Body)
 }
 
-func (a AccountClient) DeleteAccount(id string) {
-	NewRequestExecutionBuilder(a.client).
+func (a AccountClient) DeleteAccount(id string) (AccountDeletedResponse, Error) {
+	response := NewRequestExecutionBuilder(a.client).
 		withUrl(a.settings.url).
 		withUrlSuffix(fmt.Sprintf("%s%s", ApiSuffix, "/{id}?version=0")).
 		withMethod(http.MethodDelete).
 		withParam("id", id).
 		build().
 		handle()
+	return ParseToAccountDeletedResponse(id, response)
 }
+
 
 
