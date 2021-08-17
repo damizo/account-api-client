@@ -1,4 +1,4 @@
-module github.com/account
+module account
 
 go 1.16
 

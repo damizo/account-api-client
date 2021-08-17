@@ -21,7 +21,7 @@ services:
       - DATABASE-USERNAME=interview_accountapi_user
       - DATABASE-PASSWORD=123
     ports:
-      - "0.0.0.0:8087:8080"
+      - "8080:8080"
   postgresql:
     container_name: postgres
     image: postgres:9.5-alpine

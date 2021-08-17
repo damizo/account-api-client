@@ -2,6 +2,10 @@ package account
 
 import "time"
 
+type AccountServerSettings struct {
+	url string
+}
+
 type AccountAttributes struct {
 	AccountClassification   *string  `json:"account_classification,omitempty"`
 	AccountMatchingOptOut   *bool    `json:"account_matching_opt_out,omitempty"`
@@ -42,11 +46,19 @@ type Link struct {
 	Self string `json:"self"`
 }
 
+type Error struct {
+	ErrorMessage string `json:"error_message"`
+}
 
 type AccountCreatedResponse struct {
 	Data AccountCreated `json:"data"`
 	Link Link           `json:"links"`
 }
+
+type AccountDeletedResponse struct {
+	value string
+}
+
 
 type CreateAccountCommand struct {
 	Data AccountData `json:"data"`

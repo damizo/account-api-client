@@ -1,6 +1,7 @@
 package account
 
 import (
+	"fmt"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/testcontainers/testcontainers-go"
@@ -10,29 +11,29 @@ import (
 	"time"
 )
 
-var settings = AccountServerSettings{url: "http://0.0.0.0:8087"}
+var settings = AccountServerSettings{url: "http://0.0.0.0:8080"}
 var accountClient = NewAccountClient(settings)
 var id = uuid.New().String()
 var compose = testcontainers.NewLocalDockerCompose(nil, "")
 
 func TestRunDockerContainers(t *testing.T) {
-	abs, _ := filepath.Abs("../../../../docker-compose.yml")
+	abs, _ := filepath.Abs("../../docker-compose.yml")
 	composeFilePaths := []string{abs}
 
 	identifier := strings.ToLower(uuid.New().String())
-	compose := testcontainers.NewLocalDockerCompose(composeFilePaths, identifier)
+	compose = testcontainers.NewLocalDockerCompose(composeFilePaths, identifier)
 	compose.
-		WithCommand([]string{"up", "-d"}).
+		WithCommand([]string{"up", "-d", "--force-recreate"}).
 		Invoke()
+	time.Sleep(2 * time.Second)
 }
 
 func Test_Should_Create_Account(t *testing.T) {
-	time.Sleep(3 * time.Second)
 	var country = "GB"
 	names := []string{"Sam", "Holder"}
 
 	accountData := buildAccountData(names, country, id)
-	actualAccount := accountClient.CreateAccount(accountData)
+	actualAccount, _ := accountClient.CreateAccount(accountData)
 	version := int64(0)
 
 	expectedCreatedAccount := AccountCreatedResponse{Data: AccountCreated{
@@ -64,7 +65,7 @@ func Test_Should_Fetch_Account(t *testing.T) {
 	var country = "GB"
 	names := []string{"Sam", "Holder"}
 
-	actualAccount := accountClient.FetchAccount(id)
+	actualAccount, _ := accountClient.FetchAccount(id)
 	version := int64(0)
 	expectedFetchAccountQuery := FetchAccountQuery{Data: AccountData{
 		Attributes: AccountAttributes{
@@ -84,10 +85,9 @@ func Test_Should_Fetch_Account(t *testing.T) {
 }
 
 func Test_Should_Delete_Account(t *testing.T) {
-	actualResponse := accountClient.DeleteAccount(id)
-	assert.Equal(t, actualResponse.StatusCode, 204)
-	fetchAccountResult := accountClient.FetchAccount(id)
-	assert.Emptyf(t, fetchAccountResult, "")
+	accountClient.DeleteAccount(id)
+	_, e := accountClient.FetchAccount(id)
+	assert.Equal(t, e.ErrorMessage, fmt.Sprintf("record %s does not exist", id))
 }
 
 func buildAccountData(names []string, country string, id string) AccountData {
