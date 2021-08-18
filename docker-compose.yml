@@ -2,7 +2,6 @@ version: '3'
 
 services:
   accountapi:
-    container_name: account-api
     image: form3tech/interview-accountapi:v1.0.0-39-gef7db03d
     restart: on-failure
     depends_on:
@@ -23,7 +22,6 @@ services:
     ports:
       - "8080:8080"
   postgresql:
-    container_name: postgres
     image: postgres:9.5-alpine
     healthcheck:
       test: [ "CMD", "pg_isready", "-q", "-d", "postgres", "-U", "root" ]
@@ -38,7 +36,6 @@ services:
       - ./scripts/db:/docker-entrypoint-initdb.d/
 
   vault:
-    container_name: vault
     image: vault:1.6.3
     environment:
       - SKIP_SETCAP=1
