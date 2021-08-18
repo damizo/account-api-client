@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-const ErrorMessageWildcard = "error_message"
+const ErrorMessageFieldName = "error_message"
 
 func ParseFrom(data AccountData) *bytes.Buffer {
 	accountData := CreateAccountCommand{Data: data}
@@ -26,8 +26,7 @@ func ParseToAccountCreatedResponse(data io.Reader) (AccountCreatedResponse, Erro
 		log.Fatal(err)
 	}
 	responseInString := string(bodyBytes)
-
-	if strings.Contains(responseInString, ErrorMessageWildcard) {
+	if strings.Contains(responseInString, ErrorMessageFieldName) {
 		errorResponse := Error{}
 		err = json2.Unmarshal(bodyBytes, &errorResponse)
 		return AccountCreatedResponse{}, errorResponse
@@ -43,8 +42,7 @@ func ParseToFetchQueryResponse(data io.Reader) (FetchAccountQuery, Error) {
 		log.Fatal(err)
 	}
 	responseInString := string(bodyBytes)
-
-	if strings.Contains(responseInString, ErrorMessageWildcard) {
+	if strings.Contains(responseInString, ErrorMessageFieldName) {
 		errorResponse := Error{}
 		err = json2.Unmarshal(bodyBytes, &errorResponse)
 		return FetchAccountQuery{}, errorResponse
@@ -63,5 +61,8 @@ func ParseToAccountDeletedResponse(id string, response *http.Response) (AccountD
 }
 
 func isSuccess(response *http.Response) bool {
-	return response.StatusCode == 200 || response.StatusCode == 201 || response.StatusCode == 204
+	HttpCodeOk := 200
+	HttpCodeCreated := 201
+	HttpCodeNoContent := 204
+	return response.StatusCode == HttpCodeOk || response.StatusCode == HttpCodeCreated || response.StatusCode == HttpCodeNoContent
 }

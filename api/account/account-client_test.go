@@ -18,31 +18,19 @@ var id = uuid.New().String()
 var compose = testcontainers.NewLocalDockerCompose(nil, "")
 
 func TestMain(m *testing.M) {
-	// Write code here to run before tests
 	abs, _ := filepath.Abs("../../docker-compose.yml")
 	composeFilePaths := []string{abs}
-
-	fmt.Println("HELLO!")
-
 	identifier := strings.ToLower(uuid.New().String())
 	compose = testcontainers.NewLocalDockerCompose(composeFilePaths, identifier)
-	compose.
-		WithCommand([]string{"up", "-d", "--force-recreate"}).
-		Invoke()
-	time.Sleep(2 * time.Second)
-	// Run tests
+	compose.WithCommand([]string{"up", "-d", "--force-recreate"}).Invoke()
 	exitVal := m.Run()
 
-
-	down := compose.Down()
-	fmt.Println(down)
-	// Write code here to run after tests
-
-	// Exit with exit value from tests
+	compose.WithCommand([]string{"down"}).Invoke()
 	os.Exit(exitVal)
 }
 
 func Test_Should_Create_Account(t *testing.T) {
+	time.Sleep(3 * time.Second)
 	var country = "GB"
 	names := []string{"Sam", "Holder"}
 
