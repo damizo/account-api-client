@@ -38,8 +38,7 @@ func (a AccountClient) CreateAccount(accountData AccountData) (AccountCreatedRes
 	return ParseToAccountCreatedResponse(request.Body)
 }
 
-
-func (a AccountClient) FetchAccount(id string) (FetchAccountQuery, Error) {
+func (a AccountClient) FetchAccount(id string) (FetchAccountResponse, Error) {
 	request := NewRequestExecutionBuilder(a.client).
 		withUrl(a.settings.url).
 		withUrlSuffix(fmt.Sprintf("%s%s", ApiSuffix, "/{id}")).

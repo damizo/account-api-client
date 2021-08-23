@@ -14,7 +14,7 @@ import (
 const ErrorMessageFieldName = "error_message"
 
 func ParseFrom(data AccountData) *bytes.Buffer {
-	accountData := CreateAccountCommand{Data: data}
+	accountData := CreateAccountRequest{Data: data}
 	json, _ := json2.Marshal(accountData)
 	reader := bytes.NewBuffer(json)
 	return reader
@@ -36,7 +36,7 @@ func ParseToAccountCreatedResponse(data io.Reader) (AccountCreatedResponse, Erro
 	return accountCreatedResponse, Error{}
 }
 
-func ParseToFetchQueryResponse(data io.Reader) (FetchAccountQuery, Error) {
+func ParseToFetchQueryResponse(data io.Reader) (FetchAccountResponse, Error) {
 	bodyBytes, err := ioutil.ReadAll(data)
 	if err != nil {
 		log.Fatal(err)
@@ -45,9 +45,9 @@ func ParseToFetchQueryResponse(data io.Reader) (FetchAccountQuery, Error) {
 	if strings.Contains(responseInString, ErrorMessageFieldName) {
 		errorResponse := Error{}
 		err = json2.Unmarshal(bodyBytes, &errorResponse)
-		return FetchAccountQuery{}, errorResponse
+		return FetchAccountResponse{}, errorResponse
 	}
-	fetchAccountQuery := FetchAccountQuery{}
+	fetchAccountQuery := FetchAccountResponse{}
 	err = json2.Unmarshal(bodyBytes, &fetchAccountQuery)
 	return fetchAccountQuery, Error{}
 }

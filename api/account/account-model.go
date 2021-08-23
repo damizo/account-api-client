@@ -32,6 +32,19 @@ type AccountData struct {
 	Version        *int64            `json:"version,omitempty"`
 }
 
+type Link struct {
+	Self string `json:"self"`
+}
+
+type Error struct {
+	ErrorMessage string `json:"error_message"`
+}
+
+type AccountCreatedResponse struct {
+	Data AccountData `json:"data"`
+	Link Link           `json:"links"`
+}
+
 type AccountCreated struct {
 	Attributes     AccountAttributes `json:"attributes,omitempty"`
 	ID             string            `json:"id,omitempty"`
@@ -42,27 +55,14 @@ type AccountCreated struct {
 	ModifiedOn     time.Time         `json:"modified_on"`
 }
 
-type Link struct {
-	Self string `json:"self"`
-}
-
-type Error struct {
-	ErrorMessage string `json:"error_message"`
-}
-
-type AccountCreatedResponse struct {
-	Data AccountCreated `json:"data"`
-	Link Link           `json:"links"`
-}
-
 type AccountDeletedResponse struct {
 	ID string
 }
 
-type CreateAccountCommand struct {
+type CreateAccountRequest struct {
 	Data AccountData `json:"data"`
 }
-type FetchAccountQuery struct {
+type FetchAccountResponse struct {
 	Data AccountData `json:"data"`
 	Link Link        `json:"links"`
 }

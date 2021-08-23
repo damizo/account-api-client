@@ -12,25 +12,27 @@ import (
 	"time"
 )
 
-var settings = AccountServerSettings{url: "http://0.0.0.0:8080"}
+var settings = AccountServerSettings{url: "http://0.0.0.0:8087"}
 var accountClient = NewAccountClient(settings)
 var id = uuid.New().String()
-var compose = testcontainers.NewLocalDockerCompose(nil, "")
 
 func TestMain(m *testing.M) {
 	abs, _ := filepath.Abs("../../docker-compose.yml")
 	composeFilePaths := []string{abs}
 	identifier := strings.ToLower(uuid.New().String())
-	compose = testcontainers.NewLocalDockerCompose(composeFilePaths, identifier)
-	compose.WithCommand([]string{"up", "-d", "--force-recreate"}).Invoke()
+
+	var compose = testcontainers.NewLocalDockerCompose(composeFilePaths, identifier)
+	compose.WithCommand([]string{"up", "-d", "--force-recreate"}).
+		Invoke()
+	time.Sleep(5 * time.Second)
 	exitVal := m.Run()
 
-	compose.WithCommand([]string{"down"}).Invoke()
+	compose.WithCommand([]string{"down"}).
+		Invoke()
 	os.Exit(exitVal)
 }
 
 func Test_Should_Create_Account(t *testing.T) {
-	time.Sleep(3 * time.Second)
 	var country = "GB"
 	names := []string{"Sam", "Holder"}
 
@@ -38,7 +40,7 @@ func Test_Should_Create_Account(t *testing.T) {
 	actualAccount, _ := accountClient.CreateAccount(accountData)
 	version := int64(0)
 
-	expectedCreatedAccount := AccountCreatedResponse{Data: AccountCreated{
+	expectedCreatedAccount := AccountCreatedResponse{Data: AccountData{
 		Attributes: AccountAttributes{
 			BankID:       "400302",
 			BankIDCode:   "GBDSC",
@@ -51,8 +53,6 @@ func Test_Should_Create_Account(t *testing.T) {
 		OrganisationID: "eb0bd6f5-c3f5-44b2-b677-acd23cdde73c",
 		Type:           "accounts",
 		Version:        &version,
-		CreatedOn:      time.Time{},
-		ModifiedOn:     time.Time{},
 	},
 		Link: Link{Self: "/v1/organisation/accounts/" + id},
 	}
@@ -69,7 +69,7 @@ func Test_Should_Fetch_Account(t *testing.T) {
 
 	actualAccount, _ := accountClient.FetchAccount(id)
 	version := int64(0)
-	expectedFetchAccountQuery := FetchAccountQuery{Data: AccountData{
+	expectedFetchAccountQuery := FetchAccountResponse{Data: AccountData{
 		Attributes: AccountAttributes{
 			BankID:       "400302",
 			BankIDCode:   "GBDSC",

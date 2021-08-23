@@ -20,7 +20,7 @@ services:
       - DATABASE-USERNAME=interview_accountapi_user
       - DATABASE-PASSWORD=123
     ports:
-      - "8080:8080"
+      - "8087:8080"
   postgresql:
     image: postgres:9.5-alpine
     healthcheck:

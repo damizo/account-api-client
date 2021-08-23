@@ -1,11 +1,29 @@
 # Form3 Take Home Exercise
 
-## Fake account API (c) Damian Popielarski
+## Account API client - Damian Popielarski
 
-TODO
+### Technical assumptions:
+
+- I focused on simplicity and readability 
+- I used testcontainers for setting up docker containers during executions of tests, so there is no need to run docker containers out of the box.
+ Before you run tests, please make sure that in your local registry there is no containers like: ``vault, accountapi, postgresql`` (please delete already running containers, but even orphaned, not used ones containers)
+
+### API client specification:
+
+    createAccount(accountData AccountData)
+    deleteAccount(id string)
+    fetchAccount(id string)
+
+### Summary comments
+- This was my first project in Go, I had to learn everything from the scratch
+- Packages would look better, but I know that packaging process is quite different than in language that I'm currently using (Java), so I didn't want to spend a lot of time on it.
+- I've added ``time.Sleep`` function before run tests to allow all container run up
 
 
-Engineers at Form3 build highly available distributed systems in a microservices environment. Our take home test is designed to evaluate real world activities that are involved with this role. We recognise that this may not be as mentally challenging and may take longer to implement than some algorithmic tests that are often seen in interview exercises. Our approach however helps ensure that you will be working with a team of engineers with the necessary practical skills for the role (as well as a diverse range of technical wizardry). 
+
+
+
+
 
 ## Instructions
 The goal of this exercise is to write a client library in Go to access our fake account API, which is provided as a Docker
